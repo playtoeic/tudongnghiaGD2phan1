@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trò Chơi Ghép Từ Đồng Nghĩa - PLAYTOEIC GD1P3</title>
+    <!-- Bộ Font chữ bo tròn hỗ trợ Tiếng Việt -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&family=Quicksand:wght@600;700;900&display=swap" rel="stylesheet">
     <style>
         body {
@@ -162,11 +163,24 @@
             box-shadow: 0 6px 0px #e05e7c, 0 0px 12px rgba(255, 133, 161, 0.5) !important;
         }
 
+        /* Ô từ bay theo con trỏ chuột - Thiết kế phong cách bấm chọn (Nền hồng, viền trắng) */
         #floating-cursor-word {
-            position: fixed; pointer-events: none; background-color: #f97316;
-            color: white; padding: 8px 16px; border-radius: 8px; font-weight: 600;
-            font-size: 14px; box-shadow: 0 10px 20px rgba(0,0,0,0.25); z-index: 9999;
-            display: none; transform: translate(15px, 15px); white-space: nowrap;
+            position: fixed;
+            pointer-events: none;
+            font-family: 'Nunito', sans-serif;
+            background-color: #ff85a1;
+            color: #ffffff;
+            padding: 10px 22px;
+            border-radius: 18px;
+            font-weight: 900;
+            font-size: 16px;
+            letter-spacing: 0.3px;
+            border: 3px solid #ffffff;
+            box-shadow: 0 6px 0px #e05e7c, 0 10px 20px rgba(0,0,0,0.2);
+            z-index: 9999;
+            display: none;
+            transform: translate(15px, 15px);
+            white-space: nowrap;
         }
 
         #game-grid {
@@ -218,12 +232,13 @@
             color: white; font-size: 11px; padding: 2px 6px; border-radius: 4px;
             white-space: nowrap; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15);
         }
+        /* Nhãn hiển thị từ người chơi khác giữ - bổ sung viền trắng phong cách bong bóng */
         .cursor-holding-word {
             position: absolute; left: 15px; top: 32px;
-            background-color: rgba(249, 115, 22, 0.85); color: white;
-            padding: 5px 10px; border-radius: 6px; font-weight: 600; font-size: 12px;
+            background-color: #ff85a1; color: white;
+            padding: 5px 12px; border-radius: 12px; font-weight: 700; font-size: 12px;
             white-space: nowrap; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            border: 1px solid rgba(255,255,255,0.2); animation: pulse-glow 1.5s infinite ease-in-out;
+            border: 2px solid #ffffff; animation: pulse-glow 1.5s infinite ease-in-out;
         }
 
         .modal-overlay {
@@ -572,14 +587,17 @@
                             wordInZoneEl.dataset.wordText = wordText;
                             wordInZoneEl.dataset.wordUser = wordUser;
 
+                            /* Giữ nguyên màu xanh/đỏ cho từ trong bàn cờ, thêm viền trắng 3px và đổ bóng đồng bộ */
                             if (correctAnswers.includes(wordText)) {
                                 wordInZoneEl.style.backgroundColor = "#10b981"; 
-                                wordInZoneEl.style.borderColor = "#059669";
+                                wordInZoneEl.style.borderColor = "#ffffff";
+                                wordInZoneEl.style.boxShadow = "0 4px 0px #059669, 0 4px 8px rgba(0,0,0,0.08)";
                                 currentCorrectWords++;
                                 contributions[wordUser] = (contributions[wordUser] || 0) + 1;
                             } else {
                                 wordInZoneEl.style.backgroundColor = "#ef4444"; 
-                                wordInZoneEl.style.borderColor = "#dc2626";
+                                wordInZoneEl.style.borderColor = "#ffffff";
+                                wordInZoneEl.style.boxShadow = "0 4px 0px #dc2626, 0 4px 8px rgba(0,0,0,0.08)";
                             }
 
                             if (selectedWordLocal && selectedWordLocal.text === wordText && selectedWordLocal.source === `zone-${zoneData.id}`) {

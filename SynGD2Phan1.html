@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trò Chơi Ghép Từ Đồng Nghĩa - PLAYTOEIC GD1P1</title>
-    <!-- Tích hợp Canvas Confetti để bắn pháo hoa -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <!-- Sử dụng bộ Font chữ bo tròn dễ thương hỗ trợ Tiếng Việt cực tốt -->
+    <title>Trò Chơi Ghép Từ Đồng Nghĩa - PLAYTOEIC GD1P3</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&family=Quicksand:wght@600;700;900&display=swap" rel="stylesheet">
     <style>
         body {
@@ -26,7 +23,7 @@
             position: relative;
         }
 
-        /* --- Hệ thống hiệu ứng rơi (Lá và hoa) --- */
+        /* --- Hệ thống hiệu ứng rơi --- */
         .falling-container {
             position: fixed;
             top: 0;
@@ -41,15 +38,17 @@
             top: -50px;
             pointer-events: none;
             animation: fall linear infinite;
+            font-size: 24px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
         }
         @keyframes fall {
             0% { transform: translateY(0) rotate(0deg) translateX(0); opacity: 0; }
-            10% { opacity: 0.8; }
-            90% { opacity: 0.8; }
-            100% { transform: translateY(105vh) rotate(720deg) translateX(100px); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(105vh) rotate(720deg) translateX(120px); opacity: 0; }
         }
 
-        /* --- Nội dung chính phong cách Hoạt hình Béo tròn --- */
+        /* --- Nội dung chính --- */
         .main-content {
             position: relative;
             z-index: 1;
@@ -59,327 +58,203 @@
             width: 100%;
         }
         h1 {
-            color: #ff477e;
-            text-shadow: 3px 3px 0px #ffffff, 6px 6px 0px rgba(255, 71, 126, 0.2); 
-            margin-bottom: 10px;
-            text-align: center;
-            font-size: 36px;
-            font-weight: 900;
-            letter-spacing: 1px;
+            color: #ff477e; text-shadow: 3px 3px 0px #ffffff, 6px 6px 0px rgba(255, 71, 126, 0.2); 
+            margin-bottom: 10px; text-align: center; font-size: 36px; font-weight: 900;
         }
         .instructions {
-            color: #d93d4a;
-            background: #ffffff;
-            padding: 12px 26px;
-            border-radius: 30px;
-            margin-bottom: 25px;
-            text-align: center;
-            max-width: 700px;
-            font-size: 16px;
-            font-weight: 700;
-            box-shadow: 0 6px 0px #ffb7c5, 0 10px 20px rgba(0,0,0,0.06);
-            border: 3px solid #ff477e;
+            color: #d93d4a; background: #ffffff; padding: 12px 26px;
+            border-radius: 30px; margin-bottom: 25px; text-align: center;
+            max-width: 700px; font-size: 16px; font-weight: 700;
+            box-shadow: 0 6px 0px #ffb7c5, 0 10px 20px rgba(0,0,0,0.06); border: 3px solid #ff477e;
         }
 
         #reset-btn {
-            position: absolute;
-            top: 10px;
-            right: 20px;
-            z-index: 10;
-            background-color: #f43f5e;
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            font-size: 12px;
-            font-weight: bold;
-            border-radius: 25px;
-            cursor: pointer;
-            box-shadow: 0 4px 0px #c84141, 0 6px 10px rgba(0,0,0,0.1);
-            transition: all 0.2s;
+            position: absolute; top: 10px; right: 20px; z-index: 10;
+            background-color: #f43f5e; color: white; border: none;
+            padding: 6px 14px; font-size: 12px; font-weight: bold;
+            border-radius: 25px; cursor: pointer;
+            box-shadow: 0 4px 0px #c84141, 0 6px 10px rgba(0,0,0,0.1); transition: all 0.2s;
         }
-        #reset-btn:hover { 
-            background-color: #e11d48; 
-            transform: translateY(-1px); 
-        }
-        @media (max-width: 600px) {
-            #reset-btn {
-                position: static;
-                margin-bottom: 15px;
-            }
-        }
+        #reset-btn:hover { background-color: #e11d48; transform: translateY(-1px); }
+        @media (max-width: 600px) { #reset-btn { position: static; margin-bottom: 15px; } }
 
-        /* Thanh chia phần (Tabs) */
+        /* Thanh chuyển Phần (Tabs) */
         .tab-container {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 25px;
             width: 100%;
             max-width: 1200px;
             justify-content: center;
             flex-wrap: wrap;
         }
         .tab-btn {
-            padding: 10px 20px;
-            border: 1px solid rgba(255,255,255,0.5);
-            background-color: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(5px);
-            border-radius: 8px;
+            font-family: 'Quicksand', sans-serif;
+            padding: 12px 24px;
+            border: 3px solid #ff9f43;
+            background-color: #fff3e6;
+            border-radius: 20px;
             cursor: pointer;
-            font-weight: bold;
-            color: #0369a1;
-            transition: all 0.2s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            font-weight: 700;
+            font-size: 15px;
+            color: #d97d24;
+            transition: all 0.15s ease-in-out;
+            box-shadow: 0 4px 0px #cc7a29;
+        }
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0px #cc7a29;
+            background-color: #ffffff;
         }
         .tab-btn.active {
-            background-color: #0284c7;
+            background-color: #ff9f43;
             color: white;
-            border-color: #0284c7;
+            border-color: #ffffff;
+            box-shadow: 0 4px 0px #cc7a29, inset 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* Kho chứa từ hiệu ứng gương mờ */
+        /* Kho chứa từ */
         #vocab-pool {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
             width: 100%;
             max-width: 1200px;
             justify-content: center;
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
-            margin-bottom: 25px;
-            min-height: 70px;
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.85);
+            padding: 25px;
+            border-radius: 24px;
+            box-shadow: 0 10px 0px #ffcad4, 0 15px 30px rgba(228, 130, 152, 0.15);
+            margin-bottom: 30px;
+            min-height: 80px;
+            border: 4px dashed #ff85a1;
             box-sizing: border-box;
         }
+        
         .clickable-word {
-            background-color: #0284c7;
-            color: white;
-            padding: 9px 16px;
-            border-radius: 8px;
+            font-family: 'Nunito', sans-serif;
+            background-color: #4ecdc4;
+            color: #ffffff;
+            padding: 10px 22px;
+            border-radius: 18px;
             cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
+            font-weight: 900;
+            font-size: 16px;
+            letter-spacing: 0.3px;
             user-select: none;
-            box-shadow: 0 4px 6px rgba(2, 132, 199, 0.15);
-            transition: all 0.15s;
+            border: 3px solid #ffffff;
+            box-shadow: 0 4px 0px #3bbbb3, 0 4px 8px rgba(0,0,0,0.08);
+            transition: all 0.1s ease-in-out;
         }
         .clickable-word:hover {
-            background-color: #0369a1;
-            transform: translateY(-2px);
+            background-color: #3bbbb3;
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 7px 0px #2da39b, 0 6px 12px rgba(0,0,0,0.12);
+        }
+        .clickable-word:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0px #2da39b;
         }
         .clickable-word.selected {
-            background-color: #f97316 !important;
-            transform: scale(1.05);
-            box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.5);
+            background-color: #ff85a1 !important;
+            border-color: #ffffff !important;
+            transform: scale(1.06) translateY(-2px);
+            box-shadow: 0 6px 0px #e05e7c, 0 0px 12px rgba(255, 133, 161, 0.5) !important;
         }
 
-        /* Thẻ từ bay lơ lửng đi theo chuột/ngón tay */
         #floating-cursor-word {
-            position: fixed;
-            pointer-events: none;
-            background-color: #f97316;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 14px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.25);
-            z-index: 9999;
-            display: none;
-            transform: translate(15px, 15px);
-            white-space: nowrap;
+            position: fixed; pointer-events: none; background-color: #f97316;
+            color: white; padding: 8px 16px; border-radius: 8px; font-weight: 600;
+            font-size: 14px; box-shadow: 0 10px 20px rgba(0,0,0,0.25); z-index: 9999;
+            display: none; transform: translate(15px, 15px); white-space: nowrap;
         }
 
-        /* Lưới 3 cột câu hỏi */
         #game-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            width: 100%;
-            max-width: 1200px;
-            margin-bottom: 25px;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;
+            width: 100%; max-width: 1200px; margin-bottom: 25px;
         }
         @media (max-width: 900px) { #game-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 600px) { #game-grid { grid-template-columns: 1fr; } }
 
         .quiz-card {
-            padding: 15px;
-            border-radius: 14px;
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            box-sizing: border-box;
+            padding: 15px; border-radius: 14px; backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.4);
+            display: flex; flex-direction: column; gap: 10px; box-sizing: border-box;
             box-shadow: 0 4px 15px rgba(0,0,0,0.03);
         }
-        .vietnamese-def {
-            font-size: 20px;
-            font-weight: 700;
-            color: #0f172a;
-            min-height: 38px;
-            display: flex;
-            align-items: center;
-        }
+        .vietnamese-def { font-size: 20px; font-weight: 700; color: #0f172a; min-height: 38px; display: flex; align-items: center; }
 
-        /* Vùng nhận từ */
         .drop-zone {
-            border: 2px dashed rgba(2, 132, 199, 0.25);
-            border-radius: 10px;
-            min-height: 70px;
-            background-color: rgba(255, 255, 255, 0.45);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            padding: 8px;
-            align-content: flex-start;
-            cursor: pointer;
-            transition: all 0.2s;
+            border: 2px dashed rgba(2, 132, 199, 0.25); border-radius: 10px;
+            min-height: 70px; background-color: rgba(255, 255, 255, 0.45);
+            display: flex; flex-wrap: wrap; gap: 6px; padding: 8px;
+            align-content: flex-start; cursor: pointer; transition: all 0.2s;
         }
-        .drop-zone:hover {
-            background-color: rgba(255, 255, 255, 0.75);
-            border-color: #0284c7;
-        }
+        .drop-zone:hover { background-color: rgba(255, 255, 255, 0.75); border-color: #0284c7; }
 
-        /* Nút điều khiển */
-        .controls {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 50px;
-        }
+        .controls { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 50px; }
         #check-btn {
-            background-color: #10b981;
-            color: white;
-            border: none;
-            padding: 14px 40px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 30px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-            transition: all 0.2s;
+            background-color: #10b981; color: white; border: none; padding: 14px 40px;
+            font-size: 16px; font-weight: bold; border-radius: 30px; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); transition: all 0.2s;
         }
         #check-btn:hover { background-color: #059669; transform: translateY(-1px); }
-        
         #result-message {
-            font-size: 16px;
-            font-weight: bold;
-            text-align: center;
-            min-height: 24px;
-            background: rgba(255,255,255,0.7);
-            padding: 4px 12px;
-            border-radius: 10px;
+            font-size: 16px; font-weight: bold; text-align: center; min-height: 24px;
+            background: rgba(255,255,255,0.7); padding: 4px 12px; border-radius: 10px;
         }
 
-        /* Con trỏ người chơi khác */
         .other-cursor {
-            position: fixed;
-            pointer-events: none;
-            z-index: 99999;
+            position: fixed; pointer-events: none; z-index: 99999;
             transition: left 0.08s linear, top 0.08s linear;
         }
         .cursor-pointer {
-            width: 0; height: 0;
-            border-left: 12px solid #ef4444;
-            border-top: 7px solid transparent;
-            border-bottom: 7px solid transparent;
+            width: 0; height: 0; border-left: 12px solid #ef4444;
+            border-top: 7px solid transparent; border-bottom: 7px solid transparent;
             transform: rotate(-35deg);
         }
         .cursor-pointer-label {
-            position: absolute;
-            left: 12px; top: 12px;
-            background: #ef4444;
-            color: white;
-            font-size: 11px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            white-space: nowrap;
-            font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+            position: absolute; left: 12px; top: 12px; background: #ef4444;
+            color: white; font-size: 11px; padding: 2px 6px; border-radius: 4px;
+            white-space: nowrap; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15);
         }
         .cursor-holding-word {
-            position: absolute;
-            left: 15px; top: 32px;
-            background-color: rgba(249, 115, 22, 0.85);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 12px;
-            white-space: nowrap;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            border: 1px solid rgba(255,255,255,0.2);
-            animation: pulse-glow 1.5s infinite ease-in-out;
+            position: absolute; left: 15px; top: 32px;
+            background-color: rgba(249, 115, 22, 0.85); color: white;
+            padding: 5px 10px; border-radius: 6px; font-weight: 600; font-size: 12px;
+            white-space: nowrap; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255,255,255,0.2); animation: pulse-glow 1.5s infinite ease-in-out;
         }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px);
+            display: none; justify-content: center; align-items: center; z-index: 100000;
+        }
+        .modal-card {
+            background: #ffffff; border-radius: 20px; padding: 25px 30px;
+            width: 90%; max-width: 450px; text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2); border: 3px solid #ff477e;
+        }
+        .modal-card h2 { color: #ff477e; margin-top: 0; font-size: 24px; }
+        .stats-list { margin: 20px 0; padding: 0; list-style: none; text-align: left; }
+        .stats-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 14px; margin-bottom: 8px; background: #fff0f3;
+            border-radius: 10px; font-weight: bold; color: #2f3640;
+        }
+        .stats-item.top-1 { background: #fef08a; border: 2px solid #eab308; }
+        .close-modal-btn {
+            background-color: #0284c7; color: white; border: none;
+            padding: 10px 24px; font-size: 15px; font-weight: bold;
+            border-radius: 20px; cursor: pointer; transition: all 0.2s;
+        }
+        .close-modal-btn:hover { background-color: #0369a1; }
+
         @keyframes pulse-glow {
             0% { transform: scale(1); opacity: 0.9; }
             50% { transform: scale(1.03); opacity: 1; }
             100% { transform: scale(1); opacity: 0.9; }
-        }
-
-        /* --- BẢNG THỐNG KÊ MODAL --- */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(4px);
-            z-index: 100000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-card {
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 25px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            border: 3px solid #ff477e;
-            animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes modalPop {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .modal-card h2 {
-            margin-top: 0;
-            color: #ff477e;
-            text-align: center;
-            font-size: 24px;
-        }
-        .modal-card table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-        }
-        .modal-card th, .modal-card td {
-            padding: 10px;
-            border-bottom: 1fr solid #eee;
-            text-align: center;
-            font-size: 14px;
-        }
-        .modal-card th {
-            background-color: #fff1f2;
-            color: #d93d4a;
-        }
-        .modal-close-btn {
-            display: block;
-            margin: 0 auto;
-            background: #10b981;
-            color: white;
-            border: none;
-            padding: 10px 25px;
-            border-radius: 20px;
-            font-weight: bold;
-            cursor: pointer;
         }
     </style>
 </head>
@@ -389,11 +264,9 @@
 
     <div class="main-content">
         <button id="reset-btn">Reset (3)</button>
+        <h1>SYNONYMS - PLAYTOEIC (GD1P3)</h1>
+        <p class="instructions" id="status-room">🍭 Ghép các từ tiếng Anh vào đúng nghĩa Tiếng Việt!</p>
 
-        <h1>SYNONYMS - PLAYTOEIC (GD1P2)</h1>
-        <p class="instructions" id="status-room">🟢 Hãy ghép từ vào ô tiếng Việt và kiểm tra!</p>
-
-        <!-- Thanh chuyển phần -->
         <div class="tab-container">
             <button class="tab-btn active" id="tab-0">Phần 1</button>
             <button class="tab-btn" id="tab-1">Phần 2</button>
@@ -404,87 +277,82 @@
         <div id="game-grid"></div>
 
         <div class="controls">
-            <button id="check-btn">Kiểm tra / Thống Kê</button>
+            <button id="check-btn">Thống Kê Đóng Góp</button>
             <div id="result-message"></div>
         </div>
     </div>
 
-    <!-- Bảng Thống Kê Modal -->
+    <div id="floating-cursor-word"></div>
+
     <div class="modal-overlay" id="stats-modal">
         <div class="modal-card">
-            <h2>🏆 Bảng Thống Kê Đồng Bộ</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Tên người chơi</th>
-                        <th>Đã đặt (Từ)</th>
-                        <th>Chính xác</th>
-                    </tr>
-                </thead>
-                <tbody id="stats-tbody">
-                </tbody>
-            </table>
-            <button class="modal-close-btn" id="modal-close">Đóng</button>
+            <h2>🏆 Bảng Thống Kê Đóng Góp</h2>
+            <p style="font-weight: 600; color: #475569;" id="modal-part-title">Số đáp án đúng do từng người chơi ghép:</p>
+            <ul class="stats-list" id="stats-list-container"></ul>
+            <button class="close-modal-btn" onclick="document.getElementById('stats-modal').style.display='none'">Đóng lại</button>
         </div>
     </div>
 
-    <!-- Nhãn bay lơ lửng đi theo chuột -->
-    <div id="floating-cursor-word"></div>
-
-    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, set, onValue, onDisconnect, runTransaction } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyBiWYqlBXYOa0NnYIIbvMRRM1MVcbQ3ieM",
-            authDomain: "tudongnghiagd1p2.firebaseapp.com",
-            projectId: "tudongnghiagd1p2",
-            storageBucket: "tudongnghiagd1p2.firebasestorage.app",
-            messagingSenderId: "506178964200",
-            appId: "1:506178964200:web:5f1f08115f9ccfc04bd75d",
-            measurementId: "G-5Q6M9NZKBJ"
+            apiKey: "AIzaSyDLyQqf8nHHKFWqFGht4RtIhI-Xwd1XMLc",
+            authDomain: "tudongnghiagd2p1-4a0ba.firebaseapp.com",
+            projectId: "tudongnghiagd2p1-4a0ba",
+            storageBucket: "tudongnghiagd2p1-4a0ba.firebasestorage.app",
+            messagingSenderId: "544279529331",
+            appId: "1:544279529331:web:9ce8490083532764b3a706",
+            measurementId: "G-GMG9W30EP3"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        const pastelColors = ['rgba(255, 241, 242, 0.7)', 'rgba(254, 243, 199, 0.7)', 'rgba(236, 252, 203, 0.7)', 'rgba(220, 252, 231, 0.7)', 'rgba(224, 242, 254, 0.7)', 'rgba(224, 231, 255, 0.7)', 'rgba(243, 232, 255, 0.7)'];
+        const pastelColors = [
+            'rgba(255, 214, 222, 0.75)',
+            'rgba(255, 238, 204, 0.75)',
+            'rgba(212, 247, 217, 0.75)',
+            'rgba(214, 241, 252, 0.75)',
+            'rgba(226, 224, 255, 0.75)',
+            'rgba(255, 224, 252, 0.75)',
+            'rgba(228, 252, 244, 0.75)'
+        ];
+
         const allPartsData = [
             [
-                { "eng": ["access", "entrance", "entryway", "entry", "gate", "way in"], "vi": "(N) : lối vào" },
-                { "eng": ["obtain", "get", "acquire", "gain", "earn"], "vi": "(V) : lấy, có được" },
-                { "eng": ["malfunction", "not function", "out of order", "go down", "go wrong", "stop working", "fail", "break down"], "vi": "bị hỏng" },
-                { "eng": ["customer", "client", "consumer", "patron", "buyer", "purchaser"], "vi": "(N) : khách hàng" },
-                { "eng": ["expire", "become invalid", "run out"], "vi": "(V) : hết hạn" },
-                { "eng": ["effort", "attempt", "try", "strive", "endeavor"], "vi": "(N) : cố gắng, nỗ lực" },
-                { "eng": ["notify", "inform", "announce"], "vi": "(V) : thông báo" },
-                { "eng": ["perform", "conduct", "carry out", "do", "implement"], "vi": "(V) : thực hiện" },
-                { "eng": ["penalty", "fine"], "vi": "(N) : tiền phạt" },
-                { "eng": ["construct", "build"], "vi": "(V) : xây dựng" }
+                { "eng": ["Fragile", "easily broken/damaged", "breakable", "delicate"], "vi": "(adj) : mỏng manh, dễ vỡ" },
+                { "eng": ["Stress", "highlight", "emphasize", "focus on", "concentrate on"], "vi": "(V) : tập trung vào, nhấn mạnh" },
+                { "eng": ["Routine", "regular", "normal", "usual", "ordinary", "customary"], "vi": "(adj) : thông thường" },
+                { "eng": ["Stationery", "office supplies"], "vi": "văn phòng phẩm" },
+                { "eng": ["Outline", "draft", "summary", "sketch"], "vi": "(N) : bản phác thảo, tóm tắt" },
+                { "eng": ["Responsible for", "accountable for", "in charge of"], "vi": "chịu trách nhiệm" },
+                { "eng": ["Compensate", "refund", "reimburse", "recompense"], "vi": "(V) : đền bù" },
+                { "eng": ["Profit", "earnings", "proceeds", "receipts", "returns"], "vi": "(N) : lợi nhuận" },
+                { "eng": ["Salary", "wage", "pay", "payment", "stipend"], "vi": "(N) : tiền lương" }
             ],
             [
-                { "eng": ["inspect", "examine", "check", "go over", "investigation"], "vi": "(V) : kiểm tra, điều tra" },
-                { "eng": ["former", "previous", "old", "past", "last", "earlier"], "vi": "(adj) : cũ, trước" },
-                { "eng": ["purpose", "aim", "target", "objective", "goal", "intention", "intent"], "vi": "(N) : mục đích, ý định" },
-                { "eng": ["supervise", "manage", "oversee", "monitor", "keep track of"], "vi": "(V) : giám sát, theo dõi" },
-                { "eng": ["banquet", "dinner", "reception", "luncheon", "party"], "vi": "(N) : bữa tiệc" },
-                { "eng": ["rest", "remainder", "remaining part"], "vi": "(N) : phần còn lại" },
-                { "eng": ["warehouse", "stockroom", "storage", "storehouse"], "vi": "(N) : nhà kho" },
-                { "eng": ["creative", "innovative"], "vi": "(adj) : sáng tạo" },
-                { "eng": ["business", "firm", "company", "organization", "corporation", "enterprise"], "vi": "(N) : doanh nghiệp" },
-                { "eng": ["commercial", "promotion", "advertisement"], "vi": "(N) : quảng cáo" }
+                { "eng": ["Cost", "expense", "overheads", "outlay", "expenditure"], "vi": "(N) : chi phí" },
+                { "eng": ["Contact", "reach", "get in touch with"], "vi": "(V) : liên lạc" },
+                { "eng": ["Start", "begin", "commence", "institute", "initiate"], "vi": "(V) : bắt đầu, khởi đầu" },
+                { "eng": ["Commend", "praise", "compliment", "honor"], "vi": "(V) : khen ngợi" },
+                { "eng": ["Reliable", "depenable", "trustworthy"], "vi": "(adj) : đáng tin cậy" },
+                { "eng": ["Rely on/upon", "depend on/upon", "count on"], "vi": "(V) : dựa vào" },
+                { "eng": ["Competitor", "rival", "opponent", "adversary"], "vi": "(N) : đối thủ cạnh tranh" },
+                { "eng": ["Reserve", "book", "make a reservation"], "vi": "(V) : đặt trước" },
+                { "eng": ["Change", "modify", "adjust", "revise", "alter", "correct"], "vi": "(V) : thay đổi, chỉnh sửa" }
             ],
             [
-                { "eng": ["alternative", "alternate", "replacement", "substitute"], "vi": "(adj) : thay thế" },
-                { "eng": ["regularly", "frequently", "often", "normally", "generally"], "vi": "(adv) : thường xuyên, thường thường" },
-                { "eng": ["recently", "lately", "not long ago", "a short time ago"], "vi": "(adv) : gần đây" },
-                { "eng": ["rarely", "seldom", "infrequently", "hardly", "scarcely"], "vi": "(adv) : hiếm khi" },
-                { "eng": ["important", "vital", "crucial", "critical", "essential", "necessary"], "vi": "(adj) : quan trọng, cần thiết" },
-                { "eng": ["colleague", "coworker", "teammate", "workmate"], "vi": "(N) : đồng nghiệp" },
-                { "eng": ["journal", "magazine", "periodical", "newspaper"], "vi": "(N) : tạp chí, tờ báo" },
-                { "eng": ["brochure", "pamphlet", "leaflet", "flyer", "handout"], "vi": "(N) : tờ rơi, sách quảng cáo" },
-                { "eng": ["assist", "give a hand", "lend a hand", "help", "support", "aid"], "vi": "(V) : hỗ trợ" }
+                { "eng": ["Cover", "contain", "include", "consist of", "feature"], "vi": "(V) : bao gồm" },
+                { "eng": ["Because", "since", "as", "for", "now that", "seeing that", "in that"], "vi": "bởi vì [+clause]" },
+                { "eng": ["Because of", "due to", "owning to", "thanks to", "on account of", "in view of", "in light of", "as a result of"], "vi": "bởi vì [+N]" },
+                { "eng": ["Although", "even though", "though", "notwithstanding that", "while"], "vi": "mặc dù" },
+                { "eng": ["Despite", "in spite of", "notwithstanding", "regardless of"], "vi": "mặc dù" },
+                { "eng": ["Except (for)", "other than", "apart from", "aside from", "barring", "excluding"], "vi": "ngoại trừ" },
+                { "eng": ["Impact", "affect", "influence"], "vi": "(V) : ảnh hưởng, tác động" },
+                { "eng": ["Submit", "turn in", "hand in", "file"], "vi": "(V) : nộp" },
+                { "eng": ["Exceptional", "excellent", "outstanding", "special"], "vi": "(adj) : xuất sắc" }
             ]
         ];
 
@@ -493,40 +361,37 @@
         const myColor = ["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899"][Math.floor(Math.random() * 6)];
 
         let currentPartIndex = 0;
-        let selectedWordLocal = null; 
+        let selectedWordLocal = null;
         let resetClickCount = 0; 
+        let hasShownModalForPart = false;
         let latestBoardState = null;
-        let latestUsersData = {};
 
         const vocabPool = document.getElementById('vocab-pool');
         const gameGrid = document.getElementById('game-grid');
         const resultMessage = document.getElementById('result-message');
         const floatingEl = document.getElementById('floating-cursor-word');
         const resetBtn = document.getElementById('reset-btn');
-        const statsModal = document.getElementById('stats-modal');
-        const statsTbody = document.getElementById('stats-tbody');
 
-        // Mouse tracking
+        const myPresenceRef = ref(db, `presence/${myUserId}`);
+        set(myPresenceRef, { name: username, color: myColor, x: 0, y: 0, holdingWord: "" });
+        onDisconnect(myPresenceRef).remove();
+
         window.addEventListener('mousemove', (e) => {
-            set(ref(db, `presence/${myUserId}`), {
-                name: username,
-                color: myColor,
-                x: e.clientX,
-                y: e.clientY,
-                holdingWord: selectedWordLocal ? selectedWordLocal.text : ""
-            });
             updateFloatingPosition(e.clientX, e.clientY);
+            set(ref(db, `presence/${myUserId}/x`), e.clientX);
+            set(ref(db, `presence/${myUserId}/y`), e.clientY);
         });
 
         onValue(ref(db, 'presence'), (snapshot) => {
-            const data = snapshot.val();
-            latestUsersData = data || {};
-            if (!data) return;
+            const data = snapshot.val() || {};
+            document.querySelectorAll('.other-cursor').forEach(el => {
+                const userId = el.id.replace('cursor-', '');
+                if (!data[userId]) el.remove();
+            });
 
             Object.keys(data).forEach(id => {
                 if (id === myUserId) return;
                 const user = data[id];
-                
                 let cursorEl = document.getElementById(`cursor-${id}`);
                 if (!cursorEl) {
                     cursorEl = document.createElement('div');
@@ -539,7 +404,6 @@
                     `;
                     document.body.appendChild(cursorEl);
                 }
-                
                 cursorEl.style.left = user.x + 'px';
                 cursorEl.style.top = user.y + 'px';
 
@@ -553,11 +417,11 @@
             });
         });
 
-        // Game state sync
         onValue(ref(db, 'gameState/currentPart'), (snapshot) => {
             const part = snapshot.val();
             if (part !== null && part !== undefined && part !== currentPartIndex) {
                 currentPartIndex = part;
+                hasShownModalForPart = false;
                 document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
                     btn.classList.toggle('active', idx === part);
                 });
@@ -567,13 +431,9 @@
         });
 
         onValue(ref(db, 'gameState/board'), (snapshot) => {
-            latestBoardState = snapshot.val();
-            renderBoardRealtime(latestBoardState);
-            
-            // TỰ ĐỘNG BẬT THỐNG KÊ NGAY KHI GHÉP XONG TỪ CUỐI CÙNG
-            if (latestBoardState && latestBoardState.pool && latestBoardState.pool.length === 0) {
-                showStatsModal();
-            }
+            const boardState = snapshot.val();
+            latestBoardState = boardState;
+            renderBoardRealtime(boardState);
         });
 
         function updateFloatingPosition(clientX, clientY) {
@@ -610,6 +470,33 @@
             };
         }
 
+        vocabPool.addEventListener('click', () => {
+            if (selectedWordLocal) {
+                const wordText = selectedWordLocal.text;
+                const source = selectedWordLocal.source;
+
+                if (source.startsWith('zone-')) {
+                    const zoneId = parseInt(source.replace('zone-', ''));
+                    runTransaction(ref(db, 'gameState/board'), (currentBoard) => {
+                        if (currentBoard) {
+                            const targetZone = currentBoard.zones.find(z => z.id === zoneId);
+                            if (targetZone && targetZone.currentWords) {
+                                targetZone.currentWords = targetZone.currentWords.filter(item => {
+                                    const text = typeof item === 'object' ? item.word : item;
+                                    return text !== wordText;
+                                });
+                                if (!currentBoard.pool) currentBoard.pool = [];
+                                currentBoard.pool.push(wordText);
+                            }
+                        }
+                        return currentBoard;
+                    }).then((result) => {
+                        if(result.committed) resetLocalSelection();
+                    });
+                }
+            }
+        });
+
         function renderBoardRealtime(boardState) {
             if (!boardState || boardState.partIndex !== currentPartIndex) {
                 vocabPool.innerHTML = "<div style='color: #666;'>Đang tải dữ liệu...</div>";
@@ -621,7 +508,6 @@
             vocabPool.innerHTML = "";
             gameGrid.innerHTML = "";
 
-            // Pool Render
             if (boardState.pool) {
                 boardState.pool.forEach((word) => {
                     const wordEl = document.createElement('div');
@@ -638,7 +524,6 @@
                             resetLocalSelection();
                             return;
                         }
-                        
                         selectedWordLocal = { text: word, source: 'pool' };
                         document.querySelectorAll('.clickable-word').forEach(el => el.classList.remove('selected'));
                         wordEl.classList.add('selected');
@@ -646,42 +531,19 @@
                         floatingEl.innerText = word;
                         floatingEl.style.display = 'block';
                         updateFloatingPosition(e.clientX, e.clientY);
-
                         set(ref(db, `presence/${myUserId}/holdingWord`), word);
                     });
                     vocabPool.appendChild(wordEl);
                 });
             }
 
-            vocabPool.addEventListener('click', () => {
-                if (selectedWordLocal) {
-                    const wordText = selectedWordLocal.text;
-                    const source = selectedWordLocal.source;
+            let totalPartWords = 0;
+            let currentCorrectWords = 0;
+            let currentTotalPlacedWords = 0;
+            const contributions = {};
 
-                    if (source.startsWith('zone-')) {
-                        const zoneId = parseInt(source.replace('zone-', ''));
-                        
-                        runTransaction(ref(db, 'gameState/board'), (currentBoard) => {
-                            if (currentBoard) {
-                                const targetZone = currentBoard.zones.find(z => z.id === zoneId);
-                                if (targetZone && targetZone.currentWords) {
-                                    const itemIdx = targetZone.currentWords.findIndex(w => (typeof w === 'string' ? w : w.text) === wordText);
-                                    if (itemIdx !== -1) {
-                                        targetZone.currentWords.splice(itemIdx, 1);
-                                        if (!currentBoard.pool) currentBoard.pool = [];
-                                        currentBoard.pool.push(wordText);
-                                    }
-                                }
-                            }
-                            return currentBoard;
-                        }).then((result) => {
-                            if(result.committed) resetLocalSelection();
-                        });
-                    }
-                }
-            });
+            allPartsData[currentPartIndex].forEach(item => totalPartWords += item.eng.length);
 
-            // Grid Render
             if (boardState.zones) {
                 boardState.zones.forEach((zoneData, index) => {
                     const card = document.createElement('div');
@@ -690,19 +552,35 @@
 
                     const defEl = document.createElement('div');
                     defEl.classList.add('vietnamese-def');
-                    defEl.innerText = `${currentPartIndex * 10 + index + 1}. ${zoneData.vi}`;
+                    defEl.innerText = `${index + 1}. ${zoneData.vi}`;
 
                     const dropZone = document.createElement('div');
                     dropZone.classList.add('drop-zone');
                     dropZone.dataset.id = zoneData.id;
 
+                    const correctAnswers = zoneData.answers ? zoneData.answers.split(',') : [];
+
                     if (zoneData.currentWords) {
                         zoneData.currentWords.forEach(wordObj => {
-                            const wordText = typeof wordObj === 'string' ? wordObj : wordObj.text;
-                            
+                            const wordText = typeof wordObj === 'object' ? wordObj.word : wordObj;
+                            const wordUser = typeof wordObj === 'object' ? wordObj.user : 'Ẩn danh';
+                            currentTotalPlacedWords++;
+
                             const wordInZoneEl = document.createElement('div');
                             wordInZoneEl.className = 'clickable-word';
-                            wordInZoneEl.innerText = wordText;
+                            wordInZoneEl.innerHTML = `${wordText} <span class="word-author" style="font-size: 11px; opacity: 0.85;">👤 ${wordUser}</span>`;
+                            wordInZoneEl.dataset.wordText = wordText;
+                            wordInZoneEl.dataset.wordUser = wordUser;
+
+                            if (correctAnswers.includes(wordText)) {
+                                wordInZoneEl.style.backgroundColor = "#10b981"; 
+                                wordInZoneEl.style.borderColor = "#059669";
+                                currentCorrectWords++;
+                                contributions[wordUser] = (contributions[wordUser] || 0) + 1;
+                            } else {
+                                wordInZoneEl.style.backgroundColor = "#ef4444"; 
+                                wordInZoneEl.style.borderColor = "#dc2626";
+                            }
 
                             if (selectedWordLocal && selectedWordLocal.text === wordText && selectedWordLocal.source === `zone-${zoneData.id}`) {
                                 wordInZoneEl.classList.add('selected');
@@ -714,7 +592,6 @@
                                     resetLocalSelection();
                                     return;
                                 }
-
                                 selectedWordLocal = { text: wordText, source: `zone-${zoneData.id}` };
                                 document.querySelectorAll('.clickable-word').forEach(el => el.classList.remove('selected'));
                                 wordInZoneEl.classList.add('selected');
@@ -722,7 +599,6 @@
                                 floatingEl.innerText = wordText;
                                 floatingEl.style.display = 'block';
                                 updateFloatingPosition(e.clientX, e.clientY);
-
                                 set(ref(db, `presence/${myUserId}/holdingWord`), wordText);
                             });
 
@@ -738,18 +614,17 @@
 
                             runTransaction(ref(db, 'gameState/board'), (currentBoard) => {
                                 if (!currentBoard) return currentBoard;
-
-                                const wordPayload = { text: wordText, placedBy: username };
+                                const newWordObj = { word: wordText, user: username };
 
                                 if (source === 'pool') {
                                     if (currentBoard.pool && currentBoard.pool.includes(wordText)) {
                                         currentBoard.pool = currentBoard.pool.filter(w => w !== wordText);
                                         const targetZone = currentBoard.zones.find(z => z.id === targetZoneId);
-                                        if (!targetZone.currentWords) targetZone.currentWords = [];
-                                        targetZone.currentWords.push(wordPayload);
-                                    } else {
-                                        return; 
-                                    }
+                                        if (targetZone) {
+                                            if (!targetZone.currentWords) targetZone.currentWords = [];
+                                            targetZone.currentWords.push(newWordObj);
+                                        }
+                                    } else return;
                                 } 
                                 else if (source.startsWith('zone-')) {
                                     const oldZoneId = parseInt(source.replace('zone-', ''));
@@ -757,23 +632,23 @@
 
                                     const oldZone = currentBoard.zones.find(z => z.id === oldZoneId);
                                     if (oldZone && oldZone.currentWords) {
-                                        const itemIdx = oldZone.currentWords.findIndex(w => (typeof w === 'string' ? w : w.text) === wordText);
-                                        if (itemIdx !== -1) {
-                                            oldZone.currentWords.splice(itemIdx, 1);
-                                            const targetZone = currentBoard.zones.find(z => z.id === targetZoneId);
+                                        oldZone.currentWords = oldZone.currentWords.filter(item => {
+                                            const text = typeof item === 'object' ? item.word : item;
+                                            return text !== wordText;
+                                        });
+                                        const targetZone = currentBoard.zones.find(z => z.id === targetZoneId);
+                                        if (targetZone) {
                                             if (!targetZone.currentWords) targetZone.currentWords = [];
-                                            targetZone.currentWords.push(wordPayload);
-                                        } else {
-                                            return;
+                                            targetZone.currentWords.push(newWordObj);
                                         }
-                                    }
+                                    } else return;
                                 }
                                 return currentBoard;
                             }).then((result) => {
                                 if (result.committed) {
                                     resetLocalSelection();
                                 } else {
-                                    alert(`Từ "${wordText}" đã được thao tác trước đó.`);
+                                    alert(`Ối! Từ "${wordText}" đã bị người khác thao tác trước mất rồi.`);
                                     resetLocalSelection();
                                 }
                             });
@@ -785,70 +660,71 @@
                     gameGrid.appendChild(card);
                 });
             }
+
+            if (currentCorrectWords === totalPartWords && currentTotalPlacedWords === totalPartWords) {
+                resultMessage.style.color = '#10b981';
+                resultMessage.innerText = `🎉 Xuất sắc! Tất cả từ ở Phần ${currentPartIndex + 1} đã hoàn thành chính xác!`;
+                
+                if (!hasShownModalForPart) {
+                    showContributionBoard(contributions);
+                    hasShownModalForPart = true;
+                }
+            } else {
+                resultMessage.style.color = '#e11d48';
+                resultMessage.innerText = `Đã xếp ${currentTotalPlacedWords}/${totalPartWords} từ (${currentCorrectWords} từ đúng màu xanh).`;
+            }
         }
 
-        // Tabs change
         document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
             btn.addEventListener('click', () => {
                 set(ref(db, 'gameState/currentPart'), idx);
+                hasShownModalForPart = false;
                 const freshBoard = generateFreshBoard(idx);
                 set(ref(db, 'gameState/board'), freshBoard);
                 resultMessage.innerText = "";
             });
         });
 
-        // Show Stats Modal Function
-        function showStatsModal() {
-            if (!latestBoardState || !latestBoardState.zones) return;
-
-            const userStats = {};
-
-            Object.values(latestUsersData).forEach(u => {
-                userStats[u.name] = { placed: 0, correct: 0 };
-            });
-
-            latestBoardState.zones.forEach(zone => {
-                const originalData = allPartsData[currentPartIndex][zone.id];
-                const correctAnswers = originalData ? originalData.eng : [];
-
-                if (zone.currentWords) {
-                    zone.currentWords.forEach(w => {
-                        const wordText = typeof w === 'string' ? w : w.text;
-                        const author = (typeof w === 'object' && w.placedBy) ? w.placedBy : "Ẩn danh";
-
-                        if (!userStats[author]) {
-                            userStats[author] = { placed: 0, correct: 0 };
-                        }
-
-                        userStats[author].placed++;
-                        if (correctAnswers.includes(wordText)) {
-                            userStats[author].correct++;
-                        }
-                    });
-                }
-            });
-
-            statsTbody.innerHTML = "";
-            Object.keys(userStats).forEach(name => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><b>${name}</b></td>
-                    <td>${userStats[name].placed} từ</td>
-                    <td style="color: #10b981; font-weight: bold;">${userStats[name].correct} từ</td>
-                `;
-                statsTbody.appendChild(tr);
-            });
-
-            statsModal.style.display = 'flex';
-            triggerFireworks();
-        }
-
-        document.getElementById('check-btn').addEventListener('click', showStatsModal);
-        document.getElementById('modal-close').addEventListener('click', () => {
-            statsModal.style.display = 'none';
+        document.getElementById('check-btn').addEventListener('click', () => {
+            const contributions = {};
+            if (latestBoardState && latestBoardState.zones) {
+                latestBoardState.zones.forEach(zone => {
+                    const correctAnswers = zone.answers ? zone.answers.split(',') : [];
+                    if (zone.currentWords) {
+                        zone.currentWords.forEach(wordObj => {
+                            const wordText = typeof wordObj === 'object' ? wordObj.word : wordObj;
+                            const wordUser = typeof wordObj === 'object' ? wordObj.user : 'Ẩn danh';
+                            if (correctAnswers.includes(wordText)) {
+                                contributions[wordUser] = (contributions[wordUser] || 0) + 1;
+                            }
+                        });
+                    }
+                });
+            }
+            showContributionBoard(contributions);
         });
 
-        // Reset Btn
+        function showContributionBoard(contributions) {
+            document.getElementById('modal-part-title').innerText = `Số đáp án đúng từng người chơi ghép ở Phần ${currentPartIndex + 1}:`;
+            const sortedUsers = Object.keys(contributions).sort((a, b) => contributions[b] - contributions[a]);
+            const container = document.getElementById('stats-list-container');
+            container.innerHTML = "";
+
+            if (sortedUsers.length === 0) {
+                container.innerHTML = "<li class='stats-item'>Chưa có đáp án đúng nào được xếp!</li>";
+            } else {
+                sortedUsers.forEach((user, index) => {
+                    const li = document.createElement('li');
+                    li.className = `stats-item ${index === 0 ? 'top-1' : ''}`;
+                    const crown = index === 0 ? '👑 ' : `${index + 1}. `;
+                    li.innerHTML = `<span>${crown}${user}</span> <span>${contributions[user]} đáp án đúng</span>`;
+                    container.appendChild(li);
+                });
+            }
+
+            document.getElementById('stats-modal').style.display = 'flex';
+        }
+
         resetBtn.addEventListener('click', () => {
             resetClickCount++;
             if (resetClickCount < 3) {
@@ -856,30 +732,21 @@
                 resultMessage.style.color = '#f59e0b';
                 resultMessage.innerText = `Nhấn thêm ${3 - resetClickCount} lần nữa để reset bàn cờ.`;
             } else {
+                hasShownModalForPart = false;
                 const freshBoard = generateFreshBoard(currentPartIndex);
                 set(ref(db, 'gameState/board'), freshBoard).then(() => {
                     resetResetButton();
                     resetLocalSelection();
                     resultMessage.style.color = '#10b981';
-                    resultMessage.innerText = `Đã reset bàn cờ!`;
+                    resultMessage.innerText = `Đã làm sạch Phần ${currentPartIndex + 1}! Các từ đã được nhả về vị trí cũ.`;
                 });
             }
         });
 
-        function triggerFireworks() {
-            const end = Date.now() + 2500;
-            (function frame() {
-                confetti({ particleCount: 4, angle: 60, spread: 55, origin: { x: 0, y: 0.85 } });
-                confetti({ particleCount: 4, angle: 120, spread: 55, origin: { x: 1, y: 0.85 } });
-                if (Date.now() < end) requestAnimationFrame(frame);
-            }());
-        }
-
         function createFallingElements() {
             const container = document.getElementById('falling-container');
             const elements = ['🍃', '🌿', '🌸', '🌺', '🌴']; 
-            const count = 20; 
-            for (let i = 0; i < count; i++) {
+            for (let i = 0; i < 25; i++) {
                 const item = document.createElement('div');
                 item.classList.add('leaf');
                 item.innerText = elements[Math.floor(Math.random() * elements.length)];

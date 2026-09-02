@@ -207,12 +207,12 @@
         .drop-zone:hover { background-color: rgba(255, 255, 255, 0.75); border-color: #0284c7; }
 
         .controls { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 50px; }
-        #check-btn {
+        #reset-btn-check {
             background-color: #10b981; color: white; border: none; padding: 14px 40px;
             font-size: 16px; font-weight: bold; border-radius: 30px; cursor: pointer;
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); transition: all 0.2s;
         }
-        #check-btn:hover { background-color: #059669; transform: translateY(-1px); }
+        #reset-btn-check:hover { background-color: #059669; transform: translateY(-1px); }
         #result-message {
             font-size: 16px; font-weight: bold; text-align: center; min-height: 24px;
             background: rgba(255,255,255,0.7); padding: 4px 12px; border-radius: 10px;
@@ -241,31 +241,6 @@
             border: 2px solid #ffffff; animation: pulse-glow 1.5s infinite ease-in-out;
         }
 
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px);
-            display: none; justify-content: center; align-items: center; z-index: 100000;
-        }
-        .modal-card {
-            background: #ffffff; border-radius: 20px; padding: 25px 30px;
-            width: 90%; max-width: 450px; text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2); border: 3px solid #ff477e;
-        }
-        .modal-card h2 { color: #ff477e; margin-top: 0; font-size: 24px; }
-        .stats-list { margin: 20px 0; padding: 0; list-style: none; text-align: left; }
-        .stats-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 14px; margin-bottom: 8px; background: #fff0f3;
-            border-radius: 10px; font-weight: bold; color: #2f3640;
-        }
-        .stats-item.top-1 { background: #fef08a; border: 2px solid #eab308; }
-        .close-modal-btn {
-            background-color: #0284c7; color: white; border: none;
-            padding: 10px 24px; font-size: 15px; font-weight: bold;
-            border-radius: 20px; cursor: pointer; transition: all 0.2s;
-        }
-        .close-modal-btn:hover { background-color: #0369a1; }
-
         @keyframes pulse-glow {
             0% { transform: scale(1); opacity: 0.9; }
             50% { transform: scale(1.03); opacity: 1; }
@@ -292,21 +267,11 @@
         <div id="game-grid"></div>
 
         <div class="controls">
-            <button id="check-btn">Thống Kê Đóng Góp</button>
             <div id="result-message"></div>
         </div>
     </div>
 
     <div id="floating-cursor-word"></div>
-
-    <div class="modal-overlay" id="stats-modal">
-        <div class="modal-card">
-            <h2>🏆 Bảng Thống Kê Đóng Góp</h2>
-            <p style="font-weight: 600; color: #475569;" id="modal-part-title">Số đáp án đúng do từng người chơi ghép:</p>
-            <ul class="stats-list" id="stats-list-container"></ul>
-            <button class="close-modal-btn" onclick="document.getElementById('stats-modal').style.display='none'">Đóng lại</button>
-        </div>
-    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -378,8 +343,7 @@
         let currentPartIndex = 0;
         let selectedWordLocal = null;
         let resetClickCount = 0; 
-        let hasShownModalForPart = false;
-        let latestBoardState = null;
+        let latestBoardStates = {}; // Lưu trữ trạng thái của từng phần
 
         const vocabPool = document.getElementById('vocab-pool');
         const gameGrid = document.getElementById('game-grid');
@@ -387,113 +351,103 @@
         const floatingEl = document.getElementById('floating-cursor-word');
         const resetBtn = document.getElementById('reset-btn');
 
-// Tạo tham chiếu vị trí người chơi
-const myPresenceRef = ref(db, `presence/${myUserId}`);
+        // Tạo tham chiếu vị trí người chơi
+        const myPresenceRef = ref(db, `presence/${myUserId}`);
 
-// Lắng nghe trạng thái kết nối thực tế để xóa dữ liệu ngay khi ngắt/reload
-const connectedRef = ref(db, ".info/connected");
-onValue(connectedRef, (snap) => {
-    if (snap.val() === true) {
-        // Đăng ký lệnh xóa tự động trên server ngay khi ngắt kết nối
-        onDisconnect(myPresenceRef).remove();
-        
-        // Cập nhật thông tin ban đầu
-        set(myPresenceRef, { 
-            name: username, 
-            color: myColor, 
-            x: -100, 
-            y: -100, 
-            holdingWord: "",
-            lastActive: Date.now()
-        });
-    }
-});
-
-// Xóa thủ công khi trình duyệt chuẩn bị Reload / Thoát trang
-window.addEventListener('beforeunload', () => {
-    set(myPresenceRef, null);
-});
-
-onValue(ref(db, 'presence'), (snapshot) => {
-    const data = snapshot.val() || {};
-    const now = Date.now(); // 👈 THÊM DÒNG NÀY
-    
-    if (data) {
-        latestBoardState = data;
-        // renderBoard(data); // 👈 XÓA DÒNG NÀY hoặc sửa thành renderBoardRealtime
-        
-        checkAndAutoShowContribution();
-
-        // 1. Dọn dẹp DOM
-        document.querySelectorAll('.other-cursor').forEach(el => {
-            const userId = el.id.replace('cursor-', '');
-            if (!data[userId] || (now - (data[userId].lastActive || 0) > 10000)) {
-                el.remove();
-            }
-        });
-
-        // 2. Render con trỏ của những người chơi hợp lệ
-        Object.keys(data).forEach(id => {
-            if (id === myUserId) return;
-            
-            const user = data[id];
-            if (!user || !user.name || user.name === "undefined" || (now - (user.lastActive || 0) > 10000)) {
-                return;
-            }
-
-            let cursorEl = document.getElementById(`cursor-${id}`);
-            if (!cursorEl) {
-                cursorEl = document.createElement('div');
-                cursorEl.id = `cursor-${id}`;
-                cursorEl.className = 'other-cursor';
-                cursorEl.innerHTML = `
-                    <div class="cursor-pointer" style="border-left-color: ${user.color}"></div>
-                    <div class="cursor-pointer-label" style="background: ${user.color}">${user.name}</div>
-                    <div class="cursor-holding-word" style="display: none;"></div>
-                `;
-                document.body.appendChild(cursorEl);
-            }
-            
-            cursorEl.style.left = user.x + 'px';
-            cursorEl.style.top = user.y + 'px';
-
-            const holdingEl = cursorEl.querySelector('.cursor-holding-word');
-            if (user.holdingWord && user.holdingWord !== "") {
-                holdingEl.innerText = `📄 ${user.holdingWord}`;
-                holdingEl.style.display = 'block';
-            } else {
-                holdingEl.style.display = 'none';
-            }
-        });
-    }
-});
-
-window.addEventListener('mousemove', (e) => {
-    updateFloatingPosition(e.clientX, e.clientY);
-    
-    // Cập nhật tọa độ và thời gian tương tác mới nhất
-    set(ref(db, `presence/${myUserId}/x`), e.clientX);
-    set(ref(db, `presence/${myUserId}/y`), e.clientY);
-    set(ref(db, `presence/${myUserId}/lastActive`), Date.now());
-});
-        onValue(ref(db, 'gameState/currentPart'), (snapshot) => {
-            const part = snapshot.val();
-            if (part !== null && part !== undefined && part !== currentPartIndex) {
-                currentPartIndex = part;
-                hasShownModalForPart = false;
-                document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
-                    btn.classList.toggle('active', idx === part);
+        // Lắng nghe trạng thái kết nối thực tế để xóa dữ liệu ngay khi ngắt/reload
+        const connectedRef = ref(db, ".info/connected");
+        onValue(connectedRef, (snap) => {
+            if (snap.val() === true) {
+                // Đăng ký lệnh xóa tự động trên server ngay khi ngắt kết nối
+                onDisconnect(myPresenceRef).remove();
+                
+                // Cập nhật thông tin ban đầu
+                set(myPresenceRef, { 
+                    name: username, 
+                    color: myColor, 
+                    x: -100, 
+                    y: -100, 
+                    holdingWord: "",
+                    lastActive: Date.now()
                 });
-                resetLocalSelection();
-                resetResetButton(); 
             }
         });
 
-        onValue(ref(db, 'gameState/board'), (snapshot) => {
-            const boardState = snapshot.val();
-            latestBoardState = boardState;
-            renderBoardRealtime(boardState);
+        // Xóa thủ công khi trình duyệt chuẩn bị Reload / Thoát trang
+        window.addEventListener('beforeunload', () => {
+            set(myPresenceRef, null);
         });
+
+        onValue(ref(db, 'presence'), (snapshot) => {
+            const data = snapshot.val() || {};
+            const now = Date.now();
+            
+            if (data) {
+                // 1. Dọn dẹp DOM: Xóa các cursor không còn tồn tại trong DB hoặc quá 10s không hoạt động
+                document.querySelectorAll('.other-cursor').forEach(el => {
+                    const userId = el.id.replace('cursor-', '');
+                    if (!data[userId] || (now - (data[userId].lastActive || 0) > 10000)) {
+                        el.remove();
+                    }
+                });
+
+                // 2. Render con trỏ của những người chơi hợp lệ
+                Object.keys(data).forEach(id => {
+                    if (id === myUserId) return;
+                    
+                    const user = data[id];
+                    if (!user || !user.name || user.name === "undefined" || (now - (user.lastActive || 0) > 10000)) {
+                        return;
+                    }
+
+                    let cursorEl = document.getElementById(`cursor-${id}`);
+                    if (!cursorEl) {
+                        cursorEl = document.createElement('div');
+                        cursorEl.id = `cursor-${id}`;
+                        cursorEl.className = 'other-cursor';
+                        cursorEl.innerHTML = `
+                            <div class="cursor-pointer" style="border-left-color: ${user.color}"></div>
+                            <div class="cursor-pointer-label" style="background: ${user.color}">${user.name}</div>
+                            <div class="cursor-holding-word" style="display: none;"></div>
+                        `;
+                        document.body.appendChild(cursorEl);
+                    }
+                    
+                    cursorEl.style.left = user.x + 'px';
+                    cursorEl.style.top = user.y + 'px';
+
+                    const holdingEl = cursorEl.querySelector('.cursor-holding-word');
+                    if (user.holdingWord && user.holdingWord !== "") {
+                        holdingEl.innerText = `📄 ${user.holdingWord}`;
+                        holdingEl.style.display = 'block';
+                    } else {
+                        holdingEl.style.display = 'none';
+                    }
+                });
+            }
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            updateFloatingPosition(e.clientX, e.clientY);
+            
+            // Cập nhật tọa độ và thời gian tương tác mới nhất
+            set(ref(db, `presence/${myUserId}/x`), e.clientX);
+            set(ref(db, `presence/${myUserId}/y`), e.clientY);
+            set(ref(db, `presence/${myUserId}/lastActive`), Date.now());
+        });
+
+        // Lắng nghe trạng thái của từng phần riêng biệt
+        for (let i = 0; i < 3; i++) {
+            onValue(ref(db, `gameState/part${i}`), (snapshot) => {
+                const boardState = snapshot.val();
+                latestBoardStates[i] = boardState;
+                
+                // Chỉ render nếu người dùng đang xem phần này
+                if (i === currentPartIndex) {
+                    renderBoardRealtime(boardState, i);
+                }
+            });
+        }
 
         function updateFloatingPosition(clientX, clientY) {
             if (selectedWordLocal) {
@@ -536,7 +490,7 @@ window.addEventListener('mousemove', (e) => {
 
                 if (source.startsWith('zone-')) {
                     const zoneId = parseInt(source.replace('zone-', ''));
-                    runTransaction(ref(db, 'gameState/board'), (currentBoard) => {
+                    runTransaction(ref(db, `gameState/part${currentPartIndex}`), (currentBoard) => {
                         if (currentBoard) {
                             const targetZone = currentBoard.zones.find(z => z.id === zoneId);
                             if (targetZone && targetZone.currentWords) {
@@ -556,11 +510,11 @@ window.addEventListener('mousemove', (e) => {
             }
         });
 
-        function renderBoardRealtime(boardState) {
-            if (!boardState || boardState.partIndex !== currentPartIndex) {
+        function renderBoardRealtime(boardState, partIdx) {
+            if (!boardState || boardState.partIndex !== partIdx) {
                 vocabPool.innerHTML = "<div style='color: #666;'>Đang tải dữ liệu...</div>";
-                const initialBoard = generateFreshBoard(currentPartIndex);
-                set(ref(db, 'gameState/board'), initialBoard);
+                const initialBoard = generateFreshBoard(partIdx);
+                set(ref(db, `gameState/part${partIdx}`), initialBoard);
                 return;
             }
 
@@ -599,9 +553,8 @@ window.addEventListener('mousemove', (e) => {
             let totalPartWords = 0;
             let currentCorrectWords = 0;
             let currentTotalPlacedWords = 0;
-            const contributions = {};
 
-            allPartsData[currentPartIndex].forEach(item => totalPartWords += item.eng.length);
+            allPartsData[partIdx].forEach(item => totalPartWords += item.eng.length);
 
             if (boardState.zones) {
                 boardState.zones.forEach((zoneData, index) => {
@@ -631,13 +584,11 @@ window.addEventListener('mousemove', (e) => {
                             wordInZoneEl.dataset.wordText = wordText;
                             wordInZoneEl.dataset.wordUser = wordUser;
 
-                            /* Giữ nguyên màu xanh/đỏ cho từ trong bàn cờ, thêm viền trắng 3px và đổ bóng đồng bộ */
                             if (correctAnswers.includes(wordText)) {
                                 wordInZoneEl.style.backgroundColor = "#10b981"; 
                                 wordInZoneEl.style.borderColor = "#ffffff";
                                 wordInZoneEl.style.boxShadow = "0 4px 0px #059669, 0 4px 8px rgba(0,0,0,0.08)";
                                 currentCorrectWords++;
-                                contributions[wordUser] = (contributions[wordUser] || 0) + 1;
                             } else {
                                 wordInZoneEl.style.backgroundColor = "#ef4444"; 
                                 wordInZoneEl.style.borderColor = "#ffffff";
@@ -674,7 +625,7 @@ window.addEventListener('mousemove', (e) => {
                             const source = selectedWordLocal.source;
                             const targetZoneId = zoneData.id;
 
-                            runTransaction(ref(db, 'gameState/board'), (currentBoard) => {
+                            runTransaction(ref(db, `gameState/part${partIdx}`), (currentBoard) => {
                                 if (!currentBoard) return currentBoard;
                                 const newWordObj = { word: wordText, user: username };
 
@@ -725,12 +676,7 @@ window.addEventListener('mousemove', (e) => {
 
             if (currentCorrectWords === totalPartWords && currentTotalPlacedWords === totalPartWords) {
                 resultMessage.style.color = '#10b981';
-                resultMessage.innerText = `🎉 Xuất sắc! Tất cả từ ở Phần ${currentPartIndex + 1} đã hoàn thành chính xác!`;
-                
-                if (!hasShownModalForPart) {
-                    showContributionBoard(contributions);
-                    hasShownModalForPart = true;
-                }
+                resultMessage.innerText = `🎉 Xuất sắc! Tất cả từ ở Phần ${partIdx + 1} đã hoàn thành chính xác!`;
             } else {
                 resultMessage.style.color = '#e11d48';
                 resultMessage.innerText = `Đã xếp ${currentTotalPlacedWords}/${totalPartWords} từ (${currentCorrectWords} từ đúng màu xanh).`;
@@ -739,53 +685,24 @@ window.addEventListener('mousemove', (e) => {
 
         document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
             btn.addEventListener('click', () => {
-                set(ref(db, 'gameState/currentPart'), idx);
-                hasShownModalForPart = false;
-                const freshBoard = generateFreshBoard(idx);
-                set(ref(db, 'gameState/board'), freshBoard);
+                currentPartIndex = idx;
+                document.querySelectorAll('.tab-btn').forEach((b, i) => {
+                    b.classList.toggle('active', i === idx);
+                });
+                resetLocalSelection();
+                resetResetButton();
                 resultMessage.innerText = "";
+                
+                // Nếu chưa có dữ liệu cho phần này, tạo mới
+                if (!latestBoardStates[idx]) {
+                    const freshBoard = generateFreshBoard(idx);
+                    set(ref(db, `gameState/part${idx}`), freshBoard);
+                } else {
+                    // Render dữ liệu phần này
+                    renderBoardRealtime(latestBoardStates[idx], idx);
+                }
             });
         });
-
-        document.getElementById('check-btn').addEventListener('click', () => {
-            const contributions = {};
-            if (latestBoardState && latestBoardState.zones) {
-                latestBoardState.zones.forEach(zone => {
-                    const correctAnswers = zone.answers ? zone.answers.split(',') : [];
-                    if (zone.currentWords) {
-                        zone.currentWords.forEach(wordObj => {
-                            const wordText = typeof wordObj === 'object' ? wordObj.word : wordObj;
-                            const wordUser = typeof wordObj === 'object' ? wordObj.user : 'Ẩn danh';
-                            if (correctAnswers.includes(wordText)) {
-                                contributions[wordUser] = (contributions[wordUser] || 0) + 1;
-                            }
-                        });
-                    }
-                });
-            }
-            showContributionBoard(contributions);
-        });
-
-        function showContributionBoard(contributions) {
-            document.getElementById('modal-part-title').innerText = `Số đáp án đúng từng người chơi ghép ở Phần ${currentPartIndex + 1}:`;
-            const sortedUsers = Object.keys(contributions).sort((a, b) => contributions[b] - contributions[a]);
-            const container = document.getElementById('stats-list-container');
-            container.innerHTML = "";
-
-            if (sortedUsers.length === 0) {
-                container.innerHTML = "<li class='stats-item'>Chưa có đáp án đúng nào được xếp!</li>";
-            } else {
-                sortedUsers.forEach((user, index) => {
-                    const li = document.createElement('li');
-                    li.className = `stats-item ${index === 0 ? 'top-1' : ''}`;
-                    const crown = index === 0 ? '👑 ' : `${index + 1}. `;
-                    li.innerHTML = `<span>${crown}${user}</span> <span>${contributions[user]} đáp án đúng</span>`;
-                    container.appendChild(li);
-                });
-            }
-
-            document.getElementById('stats-modal').style.display = 'flex';
-        }
 
         resetBtn.addEventListener('click', () => {
             resetClickCount++;
@@ -794,9 +711,8 @@ window.addEventListener('mousemove', (e) => {
                 resultMessage.style.color = '#f59e0b';
                 resultMessage.innerText = `Nhấn thêm ${3 - resetClickCount} lần nữa để reset bàn cờ.`;
             } else {
-                hasShownModalForPart = false;
                 const freshBoard = generateFreshBoard(currentPartIndex);
-                set(ref(db, 'gameState/board'), freshBoard).then(() => {
+                set(ref(db, `gameState/part${currentPartIndex}`), freshBoard).then(() => {
                     resetResetButton();
                     resetLocalSelection();
                     resultMessage.style.color = '#10b981';
@@ -804,42 +720,6 @@ window.addEventListener('mousemove', (e) => {
                 });
             }
         });
-
-        function checkAndAutoShowContribution() {
-    if (!latestBoardState || !latestBoardState.zones) return;
-
-    let isAllCorrectAndFull = true;
-    const contributions = {};
-
-    latestBoardState.zones.forEach(zone => {
-        const correctAnswers = zone.answers ? zone.answers.split(',').map(s => s.trim()) : [];
-        const currentWords = zone.currentWords || [];
-
-        // 1. Kiểm tra số lượng từ đặt vào zone có đủ hay chưa
-        if (currentWords.length !== correctAnswers.length) {
-            isAllCorrectAndFull = false;
-        }
-
-        // 2. Kiểm tra tính đúng đắn của từng từ & Đếm số câu đúng cho mỗi user
-        currentWords.forEach(wordObj => {
-            const wordText = typeof wordObj === 'object' ? wordObj.word : wordObj;
-            const wordUser = typeof wordObj === 'object' ? wordObj.user : 'Ẩn danh';
-
-            if (correctAnswers.includes(wordText)) {
-                contributions[wordUser] = (contributions[wordUser] || 0) + 1;
-            } else {
-                // Nếu có dù chỉ 1 từ xếp sai chỗ => Chưa hoàn thành bàn cờ
-                isAllCorrectAndFull = false;
-            }
-        });
-    });
-
-    // Nếu tất cả các từ đều đúng + đủ VÀ chưa hiển thị bảng cho phần này
-    if (isAllCorrectAndFull && !hasShownModalForPart) {
-        hasShownModalForPart = true; // Đánh dấu đã hiển thị để tránh hiện lại liên tục
-        showContributionBoard(contributions);
-    }
-}
 
         function createFallingElements() {
             const container = document.getElementById('falling-container');
@@ -856,6 +736,10 @@ window.addEventListener('mousemove', (e) => {
             }
         }
         createFallingElements();
+
+        // Khởi tạo phần đầu tiên
+        const initialBoard = generateFreshBoard(0);
+        set(ref(db, 'gameState/part0'), initialBoard);
     </script>
 </body>
 </html>

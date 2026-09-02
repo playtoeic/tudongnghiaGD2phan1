@@ -416,6 +416,7 @@ window.addEventListener('beforeunload', () => {
 
 onValue(ref(db, 'presence'), (snapshot) => {
     const data = snapshot.val() || {};
+    const now = Date.now();
     if (data) {
         latestBoardState = data;
         renderBoard(data); // Hàm vẽ/cập nhật bàn cờ của bạn

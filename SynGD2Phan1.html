@@ -416,7 +416,12 @@ window.addEventListener('beforeunload', () => {
 
 onValue(ref(db, 'presence'), (snapshot) => {
     const data = snapshot.val() || {};
-    const now = Date.now();
+    if (data) {
+        latestBoardState = data;
+        renderBoard(data); // Hàm vẽ/cập nhật bàn cờ của bạn
+        
+        // 🔴 THÊM DÒNG NÀY ĐỂ TỰ ĐỘNG CHECK MỖI KHI CÓ TỪ MỚI ĐƯỢC THẢ VÀO
+        checkAndAutoShowContribution();
 
     // 1. Dọn dẹp DOM: Xóa các cursor không còn tồn tại trong DB hoặc quá 10s không hoạt động
     document.querySelectorAll('.other-cursor').forEach(el => {
@@ -798,6 +803,42 @@ window.addEventListener('mousemove', (e) => {
                 });
             }
         });
+
+        function checkAndAutoShowContribution() {
+    if (!latestBoardState || !latestBoardState.zones) return;
+
+    let isAllCorrectAndFull = true;
+    const contributions = {};
+
+    latestBoardState.zones.forEach(zone => {
+        const correctAnswers = zone.answers ? zone.answers.split(',').map(s => s.trim()) : [];
+        const currentWords = zone.currentWords || [];
+
+        // 1. Kiểm tra số lượng từ đặt vào zone có đủ hay chưa
+        if (currentWords.length !== correctAnswers.length) {
+            isAllCorrectAndFull = false;
+        }
+
+        // 2. Kiểm tra tính đúng đắn của từng từ & Đếm số câu đúng cho mỗi user
+        currentWords.forEach(wordObj => {
+            const wordText = typeof wordObj === 'object' ? wordObj.word : wordObj;
+            const wordUser = typeof wordObj === 'object' ? wordObj.user : 'Ẩn danh';
+
+            if (correctAnswers.includes(wordText)) {
+                contributions[wordUser] = (contributions[wordUser] || 0) + 1;
+            } else {
+                // Nếu có dù chỉ 1 từ xếp sai chỗ => Chưa hoàn thành bàn cờ
+                isAllCorrectAndFull = false;
+            }
+        });
+    });
+
+    // Nếu tất cả các từ đều đúng + đủ VÀ chưa hiển thị bảng cho phần này
+    if (isAllCorrectAndFull && !hasShownModalForPart) {
+        hasShownModalForPart = true; // Đánh dấu đã hiển thị để tránh hiện lại liên tục
+        showContributionBoard(contributions);
+    }
+}
 
         function createFallingElements() {
             const container = document.getElementById('falling-container');

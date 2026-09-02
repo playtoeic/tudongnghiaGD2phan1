@@ -416,56 +416,56 @@ window.addEventListener('beforeunload', () => {
 
 onValue(ref(db, 'presence'), (snapshot) => {
     const data = snapshot.val() || {};
-    const now = Date.now();
+    const now = Date.now(); // 👈 THÊM DÒNG NÀY
+    
     if (data) {
         latestBoardState = data;
-        renderBoard(data); // Hàm vẽ/cập nhật bàn cờ của bạn
+        // renderBoard(data); // 👈 XÓA DÒNG NÀY hoặc sửa thành renderBoardRealtime
         
-        // 🔴 THÊM DÒNG NÀY ĐỂ TỰ ĐỘNG CHECK MỖI KHI CÓ TỪ MỚI ĐƯỢC THẢ VÀO
         checkAndAutoShowContribution();
 
-    // 1. Dọn dẹp DOM: Xóa các cursor không còn tồn tại trong DB hoặc quá 10s không hoạt động
-    document.querySelectorAll('.other-cursor').forEach(el => {
-        const userId = el.id.replace('cursor-', '');
-        if (!data[userId] || (now - (data[userId].lastActive || 0) > 10000)) {
-            el.remove();
-        }
-    });
+        // 1. Dọn dẹp DOM
+        document.querySelectorAll('.other-cursor').forEach(el => {
+            const userId = el.id.replace('cursor-', '');
+            if (!data[userId] || (now - (data[userId].lastActive || 0) > 10000)) {
+                el.remove();
+            }
+        });
 
-    // 2. Render con trỏ của những người chơi hợp lệ
-    Object.keys(data).forEach(id => {
-        if (id === myUserId) return; // Bỏ qua chính mình
-        
-        const user = data[id];
-        // Bỏ qua nếu thiếu thông tin tên hoặc đã quá 10 giây không tương tác
-        if (!user || !user.name || user.name === "undefined" || (now - (user.lastActive || 0) > 10000)) {
-            return;
-        }
+        // 2. Render con trỏ của những người chơi hợp lệ
+        Object.keys(data).forEach(id => {
+            if (id === myUserId) return;
+            
+            const user = data[id];
+            if (!user || !user.name || user.name === "undefined" || (now - (user.lastActive || 0) > 10000)) {
+                return;
+            }
 
-        let cursorEl = document.getElementById(`cursor-${id}`);
-        if (!cursorEl) {
-            cursorEl = document.createElement('div');
-            cursorEl.id = `cursor-${id}`;
-            cursorEl.className = 'other-cursor';
-            cursorEl.innerHTML = `
-                <div class="cursor-pointer" style="border-left-color: ${user.color}"></div>
-                <div class="cursor-pointer-label" style="background: ${user.color}">${user.name}</div>
-                <div class="cursor-holding-word" style="display: none;"></div>
-            `;
-            document.body.appendChild(cursorEl);
-        }
-        
-        cursorEl.style.left = user.x + 'px';
-        cursorEl.style.top = user.y + 'px';
+            let cursorEl = document.getElementById(`cursor-${id}`);
+            if (!cursorEl) {
+                cursorEl = document.createElement('div');
+                cursorEl.id = `cursor-${id}`;
+                cursorEl.className = 'other-cursor';
+                cursorEl.innerHTML = `
+                    <div class="cursor-pointer" style="border-left-color: ${user.color}"></div>
+                    <div class="cursor-pointer-label" style="background: ${user.color}">${user.name}</div>
+                    <div class="cursor-holding-word" style="display: none;"></div>
+                `;
+                document.body.appendChild(cursorEl);
+            }
+            
+            cursorEl.style.left = user.x + 'px';
+            cursorEl.style.top = user.y + 'px';
 
-        const holdingEl = cursorEl.querySelector('.cursor-holding-word');
-        if (user.holdingWord && user.holdingWord !== "") {
-            holdingEl.innerText = `📄 ${user.holdingWord}`;
-            holdingEl.style.display = 'block';
-        } else {
-            holdingEl.style.display = 'none';
-        }
-    });
+            const holdingEl = cursorEl.querySelector('.cursor-holding-word');
+            if (user.holdingWord && user.holdingWord !== "") {
+                holdingEl.innerText = `📄 ${user.holdingWord}`;
+                holdingEl.style.display = 'block';
+            } else {
+                holdingEl.style.display = 'none';
+            }
+        });
+    }
 });
 
 window.addEventListener('mousemove', (e) => {

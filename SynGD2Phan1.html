@@ -246,6 +246,92 @@
             50% { transform: scale(1.03); opacity: 1; }
             100% { transform: scale(1); opacity: 0.9; }
         }
+
+        /* Modal Bảng thống kê */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .modal-overlay.show {
+            display: flex;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .stats-modal {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease-in-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .stats-modal h2 {
+            color: #ff477e;
+            text-align: center;
+            font-size: 28px;
+            margin: 0 0 20px 0;
+            text-shadow: 2px 2px 0px rgba(255, 71, 126, 0.1);
+        }
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .stats-table th {
+            background: linear-gradient(135deg, #ff477e 0%, #ff85a1 100%);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 700;
+            border-radius: 8px 8px 0 0;
+        }
+        .stats-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .stats-table tr:last-child td {
+            border-bottom: none;
+        }
+        .stats-table tbody tr:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+        .stats-table tbody tr:hover {
+            background-color: #f0f0f0;
+        }
+        .close-modal-btn {
+            display: block;
+            margin: 0 auto;
+            background-color: #ff477e;
+            color: white;
+            border: none;
+            padding: 12px 40px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 71, 126, 0.3);
+            transition: all 0.2s;
+        }
+        .close-modal-btn:hover {
+            background-color: #e05e7c;
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
@@ -272,6 +358,24 @@
     </div>
 
     <div id="floating-cursor-word"></div>
+
+    <!-- Modal Bảng thống kê -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="stats-modal">
+            <h2>🎉 Hoàn Thành!</h2>
+            <table class="stats-table">
+                <thead>
+                    <tr>
+                        <th>👤 Người chơi</th>
+                        <th>📊 Số từ đóng góp</th>
+                    </tr>
+                </thead>
+                <tbody id="stats-tbody">
+                </tbody>
+            </table>
+            <button class="close-modal-btn" onclick="document.getElementById('modal-overlay').classList.remove('show')">Đóng</button>
+        </div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -350,6 +454,8 @@
         const resultMessage = document.getElementById('result-message');
         const floatingEl = document.getElementById('floating-cursor-word');
         const resetBtn = document.getElementById('reset-btn');
+        const modalOverlay = document.getElementById('modal-overlay');
+        const statsTbody = document.getElementById('stats-tbody');
 
         // Tạo tham chiếu vị trí người chơi
         const myPresenceRef = ref(db, `presence/${myUserId}`);
@@ -509,6 +615,40 @@
                 }
             }
         });
+
+        function calculateContributionStats(boardState) {
+            const stats = {};
+            if (boardState && boardState.zones) {
+                boardState.zones.forEach(zone => {
+                    if (zone.currentWords) {
+                        zone.currentWords.forEach(wordObj => {
+                            const user = typeof wordObj === 'object' ? wordObj.user : 'Ẩn danh';
+                            stats[user] = (stats[user] || 0) + 1;
+                        });
+                    }
+                });
+            }
+            return stats;
+        }
+
+        function showCompletionStats(boardState) {
+            const stats = calculateContributionStats(boardState);
+            statsTbody.innerHTML = '';
+            
+            const sortedUsers = Object.entries(stats)
+                .sort((a, b) => b[1] - a[1]);
+            
+            sortedUsers.forEach(([user, count]) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user}</td>
+                    <td style="text-align: center; font-weight: 700; color: #ff477e;">${count}</td>
+                `;
+                statsTbody.appendChild(row);
+            });
+            
+            modalOverlay.classList.add('show');
+        }
 
         function renderBoardRealtime(boardState, partIdx) {
             if (!boardState || boardState.partIndex !== partIdx) {
@@ -677,6 +817,10 @@
             if (currentCorrectWords === totalPartWords && currentTotalPlacedWords === totalPartWords) {
                 resultMessage.style.color = '#10b981';
                 resultMessage.innerText = `🎉 Xuất sắc! Tất cả từ ở Phần ${partIdx + 1} đã hoàn thành chính xác!`;
+                // Hiển thị bảng thống kê sau 500ms
+                setTimeout(() => {
+                    showCompletionStats(boardState);
+                }, 500);
             } else {
                 resultMessage.style.color = '#e11d48';
                 resultMessage.innerText = `Đã xếp ${currentTotalPlacedWords}/${totalPartWords} từ (${currentCorrectWords} từ đúng màu xanh).`;
@@ -692,6 +836,7 @@
                 resetLocalSelection();
                 resetResetButton();
                 resultMessage.innerText = "";
+                modalOverlay.classList.remove('show');
                 
                 // Nếu chưa có dữ liệu cho phần này, tạo mới
                 if (!latestBoardStates[idx]) {
@@ -717,6 +862,7 @@
                     resetLocalSelection();
                     resultMessage.style.color = '#10b981';
                     resultMessage.innerText = `Đã làm sạch Phần ${currentPartIndex + 1}! Các từ đã được nhả về vị trí cũ.`;
+                    modalOverlay.classList.remove('show');
                 });
             }
         });

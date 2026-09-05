@@ -693,6 +693,7 @@
             let totalPartWords = 0;
             let currentCorrectWords = 0;
             let currentTotalPlacedWords = 0;
+            let hasAnyRed = false; // NEW: track if any incorrect (red) word exists
 
             allPartsData[partIdx].forEach(item => totalPartWords += item.eng.length);
 
@@ -733,6 +734,7 @@
                                 wordInZoneEl.style.backgroundColor = "#ef4444"; 
                                 wordInZoneEl.style.borderColor = "#ffffff";
                                 wordInZoneEl.style.boxShadow = "0 4px 0px #dc2626, 0 4px 8px rgba(0,0,0,0.08)";
+                                hasAnyRed = true; // mark that we have at least one red word
                             }
 
                             if (selectedWordLocal && selectedWordLocal.text === wordText && selectedWordLocal.source === `zone-${zoneData.id}`) {
@@ -814,9 +816,12 @@
                 });
             }
 
-            if (currentCorrectWords === totalPartWords && currentTotalPlacedWords === totalPartWords) {
+            // NEW FINISH CONDITION:
+            // Khi không còn từ màu đỏ (hasAnyRed === false) và không còn từ trong pool -> kết thúc ván
+            const poolCount = boardState.pool ? boardState.pool.length : 0;
+            if (!hasAnyRed && poolCount === 0) {
                 resultMessage.style.color = '#10b981';
-                resultMessage.innerText = `🎉 Xuất sắc! Tất cả từ ở Phần ${partIdx + 1} đã hoàn thành chính xác!`;
+                resultMessage.innerText = `🎉 Xuất sắc! Bạn đã hoàn thành Phần ${partIdx + 1}!`;
                 // Hiển thị bảng thống kê sau 500ms
                 setTimeout(() => {
                     showCompletionStats(boardState);
